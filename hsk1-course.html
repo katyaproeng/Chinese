@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的 HSK1 · Тетрадь</title>
+<style>
+  :root{
+    --paper:#F6F1E7;
+    --paper2:#EEE6D4;
+    --ink:#262220;
+    --ink-soft:#6E6459;
+    --seal:#A6352C;
+    --seal-soft:#C97B71;
+    --jade:#3F6656;
+    --gold:#B8863B;
+    --line:#DBCFB6;
+    --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
+    --serif: Georgia, "Noto Serif SC", "Songti SC", serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-tap-highlight-color:transparent;}
+  body{
+    background-image:
+      repeating-linear-gradient(transparent, transparent 27px, var(--line) 28px);
+    background-attachment:local;
+  }
+  #shell{max-width:560px;margin:0 auto;min-height:100vh;background:var(--paper);display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.08);}
+  header.top{padding:18px 18px 10px;border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:5;}
+  header.top h1{font-family:var(--serif);font-size:22px;margin:0 0 2px;font-weight:700;letter-spacing:.3px;}
+  header.top .sub{font-size:12.5px;color:var(--ink-soft);}
+  nav.tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:56px;z-index:5;scrollbar-width:none;}
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{
+    flex:0 0 auto;border:1px solid var(--line);background:var(--paper2);color:var(--ink-soft);
+    padding:7px 13px;border-radius:3px 3px 0 0;font-size:13px;font-family:var(--sans);cursor:pointer;
+    border-bottom:3px solid transparent;
+  }
+  nav.tabs button.active{background:var(--paper);color:var(--seal);border-color:var(--line);border-bottom:3px solid var(--seal);font-weight:600;}
+  main{flex:1;padding:16px 18px 40px;}
+  h2.title{font-family:var(--serif);font-size:19px;margin:2px 0 12px;}
+  h3.sub-title{font-family:var(--serif);font-size:16px;margin:18px 0 8px;color:var(--ink);}
+  p{line-height:1.55;font-size:14.5px;}
+  .muted{color:var(--ink-soft);font-size:13px;}
+  .card{background:var(--paper2);border:1px solid var(--line);border-radius:6px;padding:14px;margin-bottom:12px;}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .btn{
+    display:inline-block;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
+    padding:9px 16px;border-radius:3px;font-size:13.5px;cursor:pointer;text-align:center;font-family:var(--sans);
+  }
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
+  .btn.seal{background:var(--seal);border-color:var(--seal);}
+  .btn.jade{background:var(--jade);border-color:var(--jade);}
+  .btn:disabled{opacity:.4;}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .stamp{
+    width:30px;height:30px;min-width:30px;border:2px solid var(--seal);border-radius:5px;color:var(--seal);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;transform:rotate(-7deg);
+    font-family:var(--serif);
+  }
+  .stamp.off{border-color:var(--line);color:var(--line);transform:none;}
+  .progress-bar{height:7px;background:var(--paper);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-top:6px;}
+  .progress-bar > div{height:100%;background:var(--seal);}
+  .list-item{
+    display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--line);
+    border-radius:6px;margin-bottom:8px;background:var(--paper2);cursor:pointer;
+  }
+  .list-item:active{background:var(--paper);}
+  .list-item .name{font-weight:600;font-size:14.5px;}
+  .list-item .meta{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .cn{font-size:15px;}
+  .cn-big{font-family:var(--serif);font-size:52px;text-align:center;margin:18px 0 6px;font-weight:700;}
+  .py-big{text-align:center;color:var(--ink-soft);font-size:16px;margin-bottom:4px;}
+  .ru-big{text-align:center;font-size:16px;margin-top:6px;}
+  .flash{background:var(--paper2);border:1px solid var(--line);border-radius:10px;padding:26px 16px;min-height:220px;display:flex;flex-direction:column;justify-content:center;}
+  .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .cat-grid .card{margin-bottom:0;cursor:pointer;}
+  .opt{
+    display:block;width:100%;text-align:left;padding:11px 14px;margin-bottom:8px;border:1px solid var(--line);
+    border-radius:6px;background:var(--paper2);font-size:14.5px;cursor:pointer;font-family:var(--sans);color:var(--ink);
+  }
+  .opt.correct{border-color:var(--jade);background:#DCEAE3;}
+  .opt.wrong{border-color:var(--seal);background:#F3DAD6;}
+  .opt:disabled{cursor:default;}
+  .chip{
+    display:inline-block;padding:8px 12px;margin:4px;border:1px solid var(--line);border-radius:5px;
+    background:var(--paper2);font-size:15px;cursor:pointer;
+  }
+  .chip.used{opacity:.35;}
+  .answer-box{min-height:52px;border:1px dashed var(--line);border-radius:6px;padding:8px;margin:10px 0;background:var(--paper);}
+  .feedback{margin-top:10px;padding:10px 12px;border-radius:6px;font-size:13.5px;}
+  .feedback.ok{background:#DCEAE3;color:var(--jade);border:1px solid var(--jade);}
+  .feedback.bad{background:#F3DAD6;color:var(--seal);border:1px solid var(--seal);}
+  .speak-btn{border:1px solid var(--gold);color:var(--gold);background:transparent;border-radius:50%;width:34px;height:34px;font-size:15px;cursor:pointer;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px;}
+  .dot0{background:var(--line);} .dot1{background:var(--gold);} .dot2{background:var(--jade);}
+  #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);
+    padding:9px 16px;border-radius:5px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50;max-width:80%;text-align:center;}
+  #toast.show{opacity:1;}
+  .backlink{color:var(--ink-soft);font-size:13px;cursor:pointer;margin-bottom:10px;display:inline-block;}
+  .segmented{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:14px;}
+  .segmented button{flex:1;padding:9px;border:none;background:var(--paper2);color:var(--ink-soft);font-size:13px;cursor:pointer;font-family:var(--sans);}
+  .segmented button.active{background:var(--ink);color:var(--paper);}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--paper);border:1px solid var(--line);color:var(--ink-soft);}
+</style>
+</head>
+<body>
+<div id="shell">
+  <header class="top">
+    <h1>我的 HSK1 <span style="color:var(--seal)">笔记</span></h1>
+    <div class="sub" id="headerSub">Личная тетрадь подготовки к экзамену</div>
+  </header>
+  <nav class="tabs" id="tabs"></nav>
+  <main id="main"></main>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const CATS = {pron:'Местоимения',num:'Числа',msr:'Счётные слова',noun:'Существительные',verb:'Глаголы',adj:'Прилагательные',gram:'Служебные слова',time:'Время',ques:'Вопросительные слова',misc:'Разное'};
+
+const VOCAB = [
+ {h:'我',p:'wǒ',r:'я',c:'pron'},{h:'你',p:'nǐ',r:'ты',c:'pron'},{h:'他',p:'tā',r:'он',c:'pron'},
+ {h:'她',p:'tā',r:'она',c:'pron'},{h:'们',p:'men',r:'суффикс мн.ч. (我们 — мы)',c:'pron'},
+ {h:'这',p:'zhè',r:'этот, это',c:'pron'},{h:'那',p:'nà',r:'тот, то',c:'pron'},
+ {h:'谁',p:'shéi',r:'кто',c:'pron'},{h:'什么',p:'shénme',r:'что',c:'pron'},{h:'哪',p:'nǎ',r:'какой, который',c:'pron'},
+ {h:'一',p:'yī',r:'один',c:'num'},{h:'二',p:'èr',r:'два',c:'num'},{h:'三',p:'sān',r:'три',c:'num'},
+ {h:'四',p:'sì',r:'четыре',c:'num'},{h:'五',p:'wǔ',r:'пять',c:'num'},{h:'六',p:'liù',r:'шесть',c:'num'},
+ {h:'七',p:'qī',r:'семь',c:'num'},{h:'八',p:'bā',r:'восемь',c:'num'},{h:'九',p:'jiǔ',r:'девять',c:'num'},
+ {h:'十',p:'shí',r:'десять',c:'num'},{h:'百',p:'bǎi',r:'сто',c:'num'},{h:'零',p:'líng',r:'ноль',c:'num'},
+ {h:'两',p:'liǎng',r:'два (перед счётным словом)',c:'num'},
+ {h:'个',p:'gè',r:'универсальное счётное слово',c:'msr'},{h:'本',p:'běn',r:'счётное слово для книг',c:'msr'},
+ {h:'岁',p:'suì',r:'счётное слово для возраста',c:'msr'},{h:'块',p:'kuài',r:'юань (разговорное)',c:'msr'},
+ {h:'杯',p:'bēi',r:'счётное слово для напитков',c:'msr'},{h:'只',p:'zhī',r:'счётное слово для животных',c:'msr'},
+ {h:'人',p:'rén',r:'человек',c:'noun'},{h:'名字',p:'míngzi',r:'имя',c:'noun'},{h:'学生',p:'xuésheng',r:'ученик, студент',c:'noun'},
+ {h:'老师',p:'lǎoshī',r:'учитель',c:'noun'},{h:'医生',p:'yīshēng',r:'врач',c:'noun'},{h:'朋友',p:'péngyou',r:'друг',c:'noun'},
+ {h:'爸爸',p:'bàba',r:'папа',c:'noun'},{h:'妈妈',p:'māma',r:'мама',c:'noun'},{h:'儿子',p:'érzi',r:'сын',c:'noun'},
+ {h:'女儿',p:'nǚ\'ér',r:'дочь',c:'noun'},{h:'先生',p:'xiānsheng',r:'господин',c:'noun'},{h:'小姐',p:'xiǎojiě',r:'госпожа, девушка',c:'noun'},
+ {h:'家',p:'jiā',r:'дом, семья',c:'noun'},{h:'学校',p:'xuéxiào',r:'школа',c:'noun'},{h:'医院',p:'yīyuàn',r:'больница',c:'noun'},
+ {h:'商店',p:'shāngdiàn',r:'магазин',c:'noun'},{h:'房间',p:'fángjiān',r:'комната',c:'noun'},
+ {h:'中国',p:'Zhōngguó',r:'Китай',c:'noun'},{h:'北京',p:'Běijīng',r:'Пекин',c:'noun'},{h:'上海',p:'Shànghǎi',r:'Шанхай',c:'noun'},
+ {h:'美国',p:'Měiguó',r:'США',c:'noun'},
+ {h:'书',p:'shū',r:'книга',c:'noun'},{h:'水',p:'shuǐ',r:'вода',c:'noun'},{h:'茶',p:'chá',r:'чай',c:'noun'},
+ {h:'咖啡',p:'kāfēi',r:'кофе',c:'noun'},{h:'饭',p:'fàn',r:'еда, рис',c:'noun'},{h:'菜',p:'cài',r:'блюдо, овощи',c:'noun'},
+ {h:'米饭',p:'mǐfàn',r:'варёный рис',c:'noun'},{h:'苹果',p:'píngguǒ',r:'яблоко',c:'noun'},
+ {h:'杯子',p:'bēizi',r:'чашка, стакан',c:'noun'},{h:'桌子',p:'zhuōzi',r:'стол',c:'noun'},{h:'椅子',p:'yǐzi',r:'стул',c:'noun'},
+ {h:'电话',p:'diànhuà',r:'телефон',c:'noun'},{h:'电视',p:'diànshì',r:'телевизор',c:'noun'},{h:'电脑',p:'diànnǎo',r:'компьютер',c:'noun'},
+ {h:'报纸',p:'bàozhǐ',r:'газета',c:'noun'},{h:'衣服',p:'yīfu',r:'одежда',c:'noun'},{h:'钱',p:'qián',r:'деньги',c:'noun'},
+ {h:'元',p:'yuán',r:'юань (офиц.)',c:'noun'},{h:'猫',p:'māo',r:'кошка',c:'noun'},{h:'狗',p:'gǒu',r:'собака',c:'noun'},
+ {h:'飞机',p:'fēijī',r:'самолёт',c:'noun'},{h:'出租车',p:'chūzūchē',r:'такси',c:'noun'},{h:'汉语',p:'Hànyǔ',r:'китайский язык',c:'noun'},
+ {h:'天气',p:'tiānqì',r:'погода',c:'noun'},
+ {h:'是',p:'shì',r:'быть, являться',c:'verb'},{h:'有',p:'yǒu',r:'иметь, есть (наличие)',c:'verb'},
+ {h:'在',p:'zài',r:'находиться, быть в',c:'verb'},{h:'看',p:'kàn',r:'смотреть, читать',c:'verb'},
+ {h:'听',p:'tīng',r:'слушать',c:'verb'},{h:'说',p:'shuō',r:'говорить',c:'verb'},{h:'读',p:'dú',r:'читать вслух',c:'verb'},
+ {h:'写',p:'xiě',r:'писать',c:'verb'},{h:'吃',p:'chī',r:'есть, кушать',c:'verb'},{h:'喝',p:'hē',r:'пить',c:'verb'},
+ {h:'睡觉',p:'shuìjiào',r:'спать',c:'verb'},{h:'起床',p:'qǐchuáng',r:'вставать',c:'verb'},
+ {h:'工作',p:'gōngzuò',r:'работать',c:'verb'},{h:'学习',p:'xuéxí',r:'учиться',c:'verb'},
+ {h:'买',p:'mǎi',r:'покупать',c:'verb'},{h:'卖',p:'mài',r:'продавать',c:'verb'},{h:'做',p:'zuò',r:'делать',c:'verb'},
+ {h:'见',p:'jiàn',r:'видеть, встречать',c:'verb'},{h:'叫',p:'jiào',r:'звать, называться',c:'verb'},
+ {h:'来',p:'lái',r:'приходить',c:'verb'},{h:'去',p:'qù',r:'идти, ехать',c:'verb'},{h:'回',p:'huí',r:'возвращаться',c:'verb'},
+ {h:'坐',p:'zuò',r:'сидеть',c:'verb'},{h:'爱',p:'ài',r:'любить',c:'verb'},{h:'想',p:'xiǎng',r:'хотеть, думать',c:'verb'},
+ {h:'要',p:'yào',r:'хотеть, собираться',c:'verb'},{h:'会',p:'huì',r:'уметь',c:'verb'},{h:'能',p:'néng',r:'мочь',c:'verb'},
+ {h:'认识',p:'rènshi',r:'знать (быть знакомым)',c:'verb'},{h:'喜欢',p:'xǐhuan',r:'нравиться',c:'verb'},
+ {h:'打电话',p:'dǎ diànhuà',r:'звонить',c:'verb'},{h:'开',p:'kāi',r:'открывать',c:'verb'},{h:'住',p:'zhù',r:'жить (проживать)',c:'verb'},
+ {h:'好',p:'hǎo',r:'хороший',c:'adj'},{h:'大',p:'dà',r:'большой',c:'adj'},{h:'小',p:'xiǎo',r:'маленький',c:'adj'},
+ {h:'多',p:'duō',r:'много',c:'adj'},{h:'少',p:'shǎo',r:'мало',c:'adj'},{h:'热',p:'rè',r:'жаркий, горячий',c:'adj'},
+ {h:'冷',p:'lěng',r:'холодный',c:'adj'},{h:'高',p:'gāo',r:'высокий',c:'adj'},{h:'高兴',p:'gāoxìng',r:'радостный',c:'adj'},
+ {h:'长',p:'cháng',r:'длинный',c:'adj'},{h:'新',p:'xīn',r:'новый',c:'adj'},{h:'旧',p:'jiù',r:'старый (о вещах)',c:'adj'},
+ {h:'贵',p:'guì',r:'дорогой',c:'adj'},{h:'便宜',p:'piányi',r:'дешёвый',c:'adj'},{h:'忙',p:'máng',r:'занятый',c:'adj'},
+ {h:'很',p:'hěn',r:'очень',c:'gram'},{h:'太',p:'tài',r:'слишком',c:'gram'},{h:'都',p:'dōu',r:'все, оба',c:'gram'},
+ {h:'不',p:'bù',r:'не',c:'gram'},{h:'没',p:'méi',r:'не (для 有 и прошлого)',c:'gram'},{h:'也',p:'yě',r:'тоже',c:'gram'},
+ {h:'的',p:'de',r:'притяжательная частица',c:'gram'},{h:'了',p:'le',r:'частица завершённости',c:'gram'},
+ {h:'和',p:'hé',r:'и, с',c:'gram'},{h:'因为',p:'yīnwèi',r:'потому что',c:'gram'},{h:'所以',p:'suǒyǐ',r:'поэтому',c:'gram'},
+ {h:'但是',p:'dànshì',r:'но',c:'gram'},
+ {h:'年',p:'nián',r:'год',c:'time'},{h:'月',p:'yuè',r:'месяц',c:'time'},{h:'日',p:'rì',r:'день (дата)',c:'time'},
+ {h:'天',p:'tiān',r:'день (сутки)',c:'time'},{h:'星期',p:'xīngqī',r:'неделя',c:'time'},{h:'点',p:'diǎn',r:'час',c:'time'},
+ {h:'分钟',p:'fēnzhōng',r:'минута',c:'time'},{h:'今天',p:'jīntiān',r:'сегодня',c:'time'},{h:'明天',p:'míngtiān',r:'завтра',c:'time'},
+ {h:'昨天',p:'zuótiān',r:'вчера',c:'time'},{h:'上午',p:'shàngwǔ',r:'утро (до полудня)',c:'time'},
+ {h:'中午',p:'zhōngwǔ',r:'полдень',c:'time'},{h:'下午',p:'xiàwǔ',r:'день (после полудня)',c:'time'},
+ {h:'晚上',p:'wǎnshang',r:'вечер',c:'time'},{h:'每天',p:'měitiān',r:'каждый день',c:'time'},
+ {h:'吗',p:'ma',r:'вопросительная частица',c:'ques'},{h:'呢',p:'ne',r:'а...? (краткий вопрос)',c:'ques'},
+ {h:'几',p:'jǐ',r:'сколько (малое число)',c:'ques'},{h:'多少',p:'duōshao',r:'сколько',c:'ques'},
+ {h:'怎么',p:'zěnme',r:'как',c:'ques'},{h:'怎么样',p:'zěnmeyàng',r:'как, каково',c:'ques'},{h:'为什么',p:'wèishénme',r:'почему',c:'ques'},
+ {h:'这儿',p:'zhèr',r:'здесь',c:'misc'},{h:'那儿',p:'nàr',r:'там',c:'misc'},{h:'哪儿',p:'nǎr',r:'где',c:'misc'},
+ {h:'谢谢',p:'xièxie',r:'спасибо',c:'misc'},{h:'再见',p:'zàijiàn',r:'до свидания',c:'misc'},
+ {h:'对不起',p:'duìbuqǐ',r:'извините',c:'misc'},{h:'没关系',p:'méiguānxi',r:'ничего страшного',c:'misc'},{h:'请',p:'qǐng',r:'пожалуйста (просьба)',c:'misc'}
+];
+VOCAB.forEach((w,i)=>w.id=i);
+
+const GRAMMAR = [
+ {id:'shi',title:'是 — глагол-связка «быть»',explain:'Чтобы сказать «X — это Y», используйте структуру Подлежащее + 是 + Существительное. Отрицание — 不是, а не 不.',
+  ex:[['我是学生。','Wǒ shì xuésheng.','Я студент.'],['他是老师。','Tā shì lǎoshī.','Он учитель.'],['这不是我的书。','Zhè bú shì wǒ de shū.','Это не моя книга.']],
+  quiz:[{q:'他___医生。',o:['是','在','有','很'],a:'是'},{q:'«Я не студент» — выбери перевод',o:['我不是学生。','我没有学生。','我不学生。','我没学生。'],a:'我不是学生。'}]},
+ {id:'hen',title:'Прилагательное-сказуемое (很 + прил.)',explain:'В китайском прилагательное само по себе является сказуемым — 是 не нужен. Перед прилагательным обычно ставят 很, даже без смысла «очень» — это просто грамматическая норма.',
+  ex:[['我很好。','Wǒ hěn hǎo.','У меня всё хорошо.'],['这个房间很大。','Zhège fángjiān hěn dà.','Эта комната большая.'],['他不忙。','Tā bù máng.','Он не занят.']],
+  quiz:[{q:'今天天气___好。',o:['很','是','有','的'],a:'很'},{q:'«Он не занят» — выбери перевод',o:['他不忙。','他不是忙。','他没忙。','他很不忙。'],a:'他不忙。'}]},
+ {id:'de',title:'的 — притяжательная частица',explain:'的 ставится между определением и существительным: 我的书 — «моя книга». Часто соответствует русскому родительному падежу.',
+  ex:[['这是我的书。','Zhè shì wǒ de shū.','Это моя книга.'],['那是老师的电脑。','Nà shì lǎoshī de diànnǎo.','Это компьютер учителя.'],['我朋友的家很大。','Wǒ péngyou de jiā hěn dà.','Дом моего друга большой.']],
+  quiz:[{q:'这是我___书。',o:['的','了','吗','呢'],a:'的'},{q:'«телефон учителя» — выбери перевод',o:['老师的电话','老师电话','是老师电话','老师了电话'],a:'老师的电话'}]},
+ {id:'ma',title:'吗 — вопрос «да/нет»',explain:'Чтобы превратить утверждение в вопрос, добавьте 吗 в конец предложения. Порядок слов не меняется.',
+  ex:[['你是学生吗？','Nǐ shì xuésheng ma?','Ты студент?'],['你忙吗？','Nǐ máng ma?','Ты занят?'],['你有书吗？','Nǐ yǒu shū ma?','У тебя есть книга?']],
+  quiz:[{q:'你是老师___？',o:['吗','呢','的','了'],a:'吗'},{q:'«Ты занят?» — выбери перевод',o:['你忙吗？','你很忙。','你忙的。','忙你吗？'],a:'你忙吗？'}]},
+ {id:'ne',title:'呢 — краткий встречный вопрос',explain:'呢 после существительного/местоимения задаёт вопрос по аналогии с уже сказанным: «А ты?», «А он?».',
+  ex:[['我是学生，你呢？','Wǒ shì xuésheng, nǐ ne?','Я студент, а ты?'],['我很好，他呢？','Wǒ hěn hǎo, tā ne?','У меня всё хорошо, а у него?']],
+  quiz:[{q:'我喝茶，你___？',o:['呢','吗','的','了'],a:'呢'},{q:'«Я студент, а ты?» — выбери перевод',o:['我是学生，你呢？','你是学生吗？','我是学生的。','你呢是学生？'],a:'我是学生，你呢？'}]},
+ {id:'qw',title:'Вопросительные слова',explain:'什么/谁/哪/哪儿/几/多少/怎么/为什么 занимают место «неизвестного» элемента, порядок слов не меняется, а 吗 не используется.',
+  ex:[['这是什么？','Zhè shì shénme?','Что это?'],['他是谁？','Tā shì shéi?','Кто он?'],['你在哪儿工作？','Nǐ zài nǎr gōngzuò?','Где ты работаешь?']],
+  quiz:[{q:'你有___本书？(сколько)',o:['几','什么','谁','怎么'],a:'几'},{q:'这___钱？(сколько, для больших чисел)',o:['多少','几','什么','哪'],a:'多少'}]},
+ {id:'num',title:'Числительные и счётные слова',explain:'Между числительным и существительным обычно стоит счётное слово: 个 (универсальное), 本 (для книг), 岁 (для возраста), 块 (для денег). Перед счётным словом «2» — всегда 两, а не 二.',
+  ex:[['我有两本书。','Wǒ yǒu liǎng běn shū.','У меня две книги.'],['他今年十岁。','Tā jīnnián shí suì.','Ему сейчас 10 лет.'],['这个五块钱。','Zhège wǔ kuài qián.','Это стоит 5 юаней.']],
+  quiz:[{q:'我有___本书。(2 книги)',o:['两','二','三','十'],a:'两'},{q:'这___多少钱？',o:['个','本','岁','块'],a:'个'}]},
+ {id:'you',title:'有 — иметь / есть в наличии',explain:'有 выражает обладание или наличие: Подлежащее + 有 + Объект. Отрицание — только 没有, никогда не 不有.',
+  ex:[['我有一个朋友。','Wǒ yǒu yī gè péngyou.','У меня есть друг.'],['他没有钱。','Tā méi yǒu qián.','У него нет денег.'],['家里有猫和狗。','Jiā li yǒu māo hé gǒu.','Дома есть кошка и собака.']],
+  quiz:[{q:'我___钱。(нет денег)',o:['没有','不是','不有','没是'],a:'没有'},{q:'他___一本书。',o:['有','是','在','很'],a:'有'}]},
+ {id:'zai',title:'在 — местонахождение',explain:'在 указывает на местоположение: Подлежащее + 在 + Место. Также ставится перед глаголом для «делать что-то там-то»: 我在家看书。',
+  ex:[['我在家。','Wǒ zài jiā.','Я дома.'],['他在学校工作。','Tā zài xuéxiào gōngzuò.','Он работает в школе.'],['你在哪儿？','Nǐ zài nǎr?','Где ты?']],
+  quiz:[{q:'我___北京学习。',o:['在','是','有','的'],a:'在'},{q:'«Я дома» — выбери перевод',o:['我在家。','我是家。','我家在。','我有家。'],a:'我在家。'}]},
+ {id:'time',title:'Порядок слов со временем',explain:'Слово, указывающее время (今天, 明天, 八点 и т.п.), ставится в начале предложения или сразу после подлежащего — но всегда перед глаголом.',
+  ex:[['我今天很忙。','Wǒ jīntiān hěn máng.','Я сегодня занят.'],['他明天去学校。','Tā míngtiān qù xuéxiào.','Он завтра идёт в школу.'],['我们八点吃饭。','Wǒmen bā diǎn chīfàn.','Мы едим в 8 часов.']],
+  quiz:[{q:'«Я завтра иду домой» — выбери верный порядок',o:['我明天回家。','我回家明天。','明天回我家。','我回明天家。'],a:'我明天回家。'},{q:'他___去商店。(сегодня)',o:['今天','的','了','很'],a:'今天'}]},
+ {id:'le',title:'了 — завершённость действия',explain:'了 после глагола показывает, что действие уже произошло или завершилось.',
+  ex:[['我吃饭了。','Wǒ chīfàn le.','Я уже поел.'],['他回家了。','Tā huí jiā le.','Он вернулся домой.'],['我买了一本书。','Wǒ mǎi le yī běn shū.','Я купил книгу.']],
+  quiz:[{q:'我看___那本书。(уже посмотрел)',o:['了','吗','呢','的'],a:'了'},{q:'«Он вернулся домой» — выбери перевод',o:['他回家了。','他回家吗？','他回家的。','他了回家。'],a:'他回家了。'}]},
+ {id:'modal',title:'想 / 要 / 会 / 能 — модальные глаголы',explain:'想 — хотеть (желание), 要 — хотеть/собираться, 会 — уметь (навык), 能 — мочь (возможность). Все ставятся перед основным глаголом.',
+  ex:[['我想喝水。','Wǒ xiǎng hē shuǐ.','Я хочу пить воду.'],['她会说汉语。','Tā huì shuō Hànyǔ.','Она умеет говорить по-китайски.'],['我不能去。','Wǒ bù néng qù.','Я не могу пойти.']],
+  quiz:[{q:'我___说汉语。(умею)',o:['会','想','能','要'],a:'会'},{q:'他___喝茶。(хочет)',o:['想','会','能','的'],a:'想'}]},
+ {id:'yedou',title:'也 и 都 — «тоже» и «все»',explain:'也 («тоже») и 都 («все/оба») ставятся после подлежащего, перед глаголом или прилагательным.',
+  ex:[['我也是学生。','Wǒ yě shì xuésheng.','Я тоже студент.'],['我们都很忙。','Wǒmen dōu hěn máng.','Мы все заняты.'],['他也喜欢喝茶。','Tā yě xǐhuan hē chá.','Он тоже любит пить чай.']],
+  quiz:[{q:'我___喜欢喝茶。(тоже)',o:['也','都','很','的'],a:'也'},{q:'他们___是老师。(все)',o:['都','也','很','太'],a:'都'}]},
+ {id:'he',title:'和 — союз «и»',explain:'和 соединяет существительные («A и B»), но обычно не соединяет целые предложения или глаголы.',
+  ex:[['我和你都是学生。','Wǒ hé nǐ dōu shì xuésheng.','Я и ты — оба студенты.'],['我喜欢茶和咖啡。','Wǒ xǐhuan chá hé kāfēi.','Я люблю чай и кофе.']],
+  quiz:[{q:'爸爸___妈妈都在家。',o:['和','也','都','的'],a:'和'}]}
+];
+
+const READING = [
+ {id:'r1',title:'自我介绍 · Знакомство',
+  text:['你好！我叫王明。','我是学生，在北京学习汉语。','我二十岁。','我家有爸爸和妈妈，也有很多朋友。','我很喜欢喝茶。'],
+  q:[{q:'王明是做什么的？',o:['老师','学生','医生'],a:'学生'},{q:'王明在哪儿学习汉语？',o:['北京','上海','美国'],a:'北京'},{q:'王明喜欢喝什么？',o:['水','茶','饭'],a:'茶'}]},
+ {id:'r2',title:'我的家 · Моя семья',
+  text:['我家不大，但是很好。','我家有爸爸、妈妈和我。','我爸爸是医生，他在医院工作。','我妈妈是老师，她在学校工作。','我家有一只猫和一只狗。','我很爱我的家。'],
+  q:[{q:'爸爸是做什么的？',o:['医生','老师','学生'],a:'医生'},{q:'妈妈在哪儿工作？',o:['医院','学校','商店'],a:'学校'},{q:'家里有什么动物？',o:['猫和狗','猫和鸟','狗和马'],a:'猫和狗'}]},
+ {id:'r3',title:'我的一天 · Мой день',
+  text:['我每天上午八点去学校。','中午十二点我吃饭。','下午三点我学习汉语，看书。','晚上七点我回家，看电视。','我十一点睡觉。'],
+  q:[{q:'我几点去学校？',o:['七点','八点','九点'],a:'八点'},{q:'我中午做什么？',o:['吃饭','睡觉','工作'],a:'吃饭'},{q:'我晚上做什么？',o:['看电视','学习汉语','去商店'],a:'看电视'}]},
+ {id:'r4',title:'在商店 · В магазине',
+  text:['今天我去商店。','我想买一本书和一杯茶。','这本书不贵，很便宜，十块钱。','茶也不贵。','我很高兴。'],
+  q:[{q:'我去哪儿？',o:['商店','学校','医院'],a:'商店'},{q:'书贵吗？',o:['很贵','很便宜','不知道'],a:'很便宜'},{q:'书多少钱？',o:['五块','十块','一百块'],a:'十块'}]},
+ {id:'r5',title:'今天很忙 · Занятой день',
+  text:['我今天很忙，也很热。','我想喝水，也想喝茶。','明天我不忙，我想在家看电视，也想看书。','我家很小，但是很好。'],
+  q:[{q:'我今天忙吗？',o:['很忙','不忙','不知道'],a:'很忙'},{q:'我明天想做什么？',o:['工作','在家看电视','去商店'],a:'在家看电视'}]},
+ {id:'r6',title:'认识新朋友 · Новое знакомство',
+  text:['A：你好！你叫什么名字？','B：我叫李红。你呢？','A：我叫马丁。你是中国人吗？','B：是，我是中国人。你也是中国人吗？','A：不是，我是美国人。你是学生吗？','B：是，我是学生，我在北京学习。你也是学生吗？','A：不是，我是老师。'],
+  q:[{q:'李红是哪国人？',o:['中国人','美国人','不知道'],a:'中国人'},{q:'马丁是做什么的？',o:['学生','老师','医生'],a:'老师'},{q:'李红在哪儿学习？',o:['北京','上海','美国'],a:'北京'}]}
+];
+
+/* Used for writing (word order) AND sentence listening */
+const SENTENCES = [
+ {ru:'Я студент.',t:['我','是','学生。']},
+ {ru:'Он не занят.',t:['他','不','忙。']},
+ {ru:'Это моя книга.',t:['这','是','我','的','书。']},
+ {ru:'Ты студент?',t:['你','是','学生','吗？']},
+ {ru:'Я студент, а ты?',t:['我','是','学生，','你','呢？']},
+ {ru:'Что это?',t:['这','是','什么？']},
+ {ru:'У меня две книги.',t:['我','有','两','本','书。']},
+ {ru:'У него нет денег.',t:['他','没有','钱。']},
+ {ru:'Я дома.',t:['我','在','家。']},
+ {ru:'Он работает в школе.',t:['他','在','学校','工作。']},
+ {ru:'Я сегодня занят.',t:['我','今天','很','忙。']},
+ {ru:'Он завтра идёт в школу.',t:['他','明天','去','学校。']},
+ {ru:'Я уже поел.',t:['我','吃饭','了。']},
+ {ru:'Она умеет говорить по-китайски.',t:['她','会','说','汉语。']},
+ {ru:'Я тоже студент.',t:['我','也','是','学生。']},
+ {ru:'Мы все заняты.',t:['我们','都','很','忙。']},
+ {ru:'Я люблю чай и кофе.',t:['我','喜欢','茶','和','咖啡。']},
+ {ru:'Эта книга дорогая.',t:['这','本','书','很','贵。']},
+ {ru:'Дом моего друга большой.',t:['我','朋友','的','家','很','大。']},
+ {ru:'У меня есть друг.',t:['我','有','一','个','朋友。']}
+];
+SENTENCES.forEach(s=>s.cn=s.t.join(''));
+
+/* ============ STORAGE ============ */
+const DEFAULT_PROGRESS = ()=>({vocab:{}, grammar:[], reading:{}, tests:[], listenBest:0, writeBest:0});
+let progress = DEFAULT_PROGRESS();
+let storageOK = true;
+
+async function loadProgress(){
+  try{
+    const r = await window.storage.get('hsk1-progress', false);
+    if(r && r.value) progress = Object.assign(DEFAULT_PROGRESS(), JSON.parse(r.value));
+  }catch(e){ /* first run or storage unavailable */ }
+}
+async function saveProgress(){
+  try{ await window.storage.set('hsk1-progress', JSON.stringify(progress), false); }
+  catch(e){ storageOK=false; }
+}
+
+/* ============ UTIL ============ */
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function pickN(arr,n){ return shuffle(arr).slice(0,n); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(window._toastT); window._toastT=setTimeout(()=>t.classList.remove('show'),1800); }
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)){ toast('Озвучка не поддерживается этим браузером'); return; }
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/[。，？！]/g,''));
+    u.lang='zh-CN'; u.rate=0.82;
+    const voices = speechSynthesis.getVoices();
+    const v = voices.find(v=>v.lang && v.lang.toLowerCase().indexOf('zh')===0);
+    if(v) u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){ toast('Не удалось воспроизвести звук'); }
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ============ APP STATE / NAV ============ */
+const TABS = [
+ {id:'dash', label:'Обзор'},
+ {id:'vocab', label:'Слова'},
+ {id:'grammar', label:'Грамматика'},
+ {id:'reading', label:'Чтение'},
+ {id:'listen', label:'Аудирование'},
+ {id:'write', label:'Письмо'},
+ {id:'test', label:'Тест'}
+];
+let currentTab='dash';
+
+function renderTabs(){
+  const nav = document.getElementById('tabs');
+  nav.innerHTML = TABS.map(t=>`<button data-tab="${t.id}" class="${t.id===currentTab?'active':''}">${t.label}</button>`).join('');
+  nav.querySelectorAll('button').forEach(b=> b.addEventListener('click', ()=> go(b.dataset.tab)) );
+}
+function go(tab){
+  currentTab = tab;
+  renderTabs();
+  const main = document.getElementById('main');
+  main.scrollTop = 0; window.scrollTo(0,0);
+  if(tab==='dash') renderDash(main);
+  else if(tab==='vocab') renderVocabHome(main);
+  else if(tab==='grammar') renderGrammarHome(main);
+  else if(tab==='reading') renderReadingHome(main);
+  else if(tab==='listen') renderListenHome(main);
+  else if(tab==='write') renderWriteHome(main);
+  else if(tab==='test') renderTestHome(main);
+}
+
+/* ============ DASHBOARD ============ */
+function vocabStats(){
+  let known=0, learning=0;
+  VOCAB.forEach(w=>{ const lv=progress.vocab[w.id]||0; if(lv===2) known++; else if(lv===1) learning++; });
+  return {known, learning, total:VOCAB.length};
+}
+function renderDash(main){
+  const vs = vocabStats();
+  const gDone = progress.grammar.length, gTotal = GRAMMAR.length;
+  const rDone = Object.keys(progress.reading).filter(k=>progress.reading[k].done).length, rTotal = READING.length;
+  const lastTest = progress.tests.length ? progress.tests[progress.tests.length-1] : null;
+  const overallPct = Math.round(((vs.known/vs.total)*0.4 + (gDone/gTotal)*0.3 + (rDone/rTotal)*0.3)*100);
+
+  main.innerHTML = `
+    <h2 class="title">Твой прогресс</h2>
+    <div class="card">
+      <div class="row"><strong>Общий прогресс HSK1</strong><span class="pill">${overallPct}%</span></div>
+      <div class="progress-bar"><div style="width:${overallPct}%"></div></div>
+      <p class="muted" style="margin-top:10px">Курс основан на классическом списке HSK 1 (150 слов, Hanban 2010) + немного бонусной лексики. Он по-прежнему принимается наряду с новым HSK 3.0 во многих центрах — если сдаёшь по новой версии, список слов там немного шире.</p>
+    </div>
+
+    <div class="card" data-go="vocab">
+      <div class="row"><strong>📖 Слова</strong><span class="pill">${vs.known}/${vs.total}</span></div>
+      <div class="progress-bar"><div style="width:${Math.round(vs.known/vs.total*100)}%"></div></div>
+      <p class="muted">Выучено — ${vs.known}, учится — ${vs.learning}, ещё не открыто — ${vs.total-vs.known-vs.learning}</p>
+    </div>
+    <div class="card" data-go="grammar">
+      <div class="row"><strong>🧩 Грамматика</strong><span class="pill">${gDone}/${gTotal}</span></div>
+      <div class="progress-bar"><div style="width:${Math.round(gDone/gTotal*100)}%"></div></div>
+    </div>
+    <div class="card" data-go="reading">
+      <div class="row"><strong>📰 Чтение</strong><span class="pill">${rDone}/${rTotal}</span></div>
+      <div class="progress-bar"><div style="width:${Math.round(rDone/rTotal*100)}%"></div></div>
+    </div>
+    <div class="card" data-go="listen">
+      <div class="row"><strong>🎧 Аудирование</strong><span class="pill">рекорд ${progress.listenBest}%</span></div>
+    </div>
+    <div class="card" data-go="write">
+      <div class="row"><strong>✍️ Письмо</strong><span class="pill">рекорд ${progress.writeBest}%</span></div>
+    </div>
+    <div class="card" data-go="test">
+      <div class="row"><strong>🧾 Комплексный тест</strong><span class="pill">${lastTest? lastTest.score+'/'+lastTest.total : 'ещё не пройден'}</span></div>
+      <p class="muted">Смешанный тест по всем разделам — как настоящий формат экзамена.</p>
+    </div>
+    <button class="btn ghost" id="resetBtn" style="margin-top:8px">Сбросить прогресс</button>
+  `;
+  main.querySelectorAll('[data-go]').forEach(el=> el.style.cursor='pointer');
+  main.querySelectorAll('[data-go]').forEach(el=> el.addEventListener('click', ()=> go(el.dataset.go)));
+  document.getElementById('resetBtn').addEventListener('click', async ()=>{
+    if(confirm('Точно сбросить весь прогресс? Это нельзя отменить.')){
+      progress = DEFAULT_PROGRESS();
+      await saveProgress();
+      renderDash(main);
+      toast('Прогресс сброшен');
+    }
+  });
+}
+
+/* ============ VOCAB ============ */
+function renderVocabHome(main){
+  const rows = Object.keys(CATS).map(c=>{
+    const words = VOCAB.filter(w=>w.c===c);
+    const known = words.filter(w=>(progress.vocab[w.id]||0)===2).length;
+    return `<div class="card" style="cursor:pointer" data-cat="${c}">
+      <div class="row"><strong>${CATS[c]}</strong><span class="pill">${known}/${words.length}</span></div>
+      <div class="progress-bar"><div style="width:${Math.round(known/words.length*100)}%"></div></div>
+    </div>`;
+  }).join('');
+  main.innerHTML = `<h2 class="title">Словарь HSK1</h2>
+    <p class="muted">Выбери тему, чтобы учить карточками, или посмотри общий список.</p>
+    <div class="btn-row"><button class="btn seal" id="allCards">🗂 Карточки: все слова</button><button class="btn ghost" id="allList">📋 Список всех слов</button></div>
+    <h3 class="sub-title">По темам</h3>
+    ${rows}`;
+  main.querySelectorAll('[data-cat]').forEach(el=> el.addEventListener('click', ()=> renderVocabList(main, el.dataset.cat)) );
+  document.getElementById('allCards').addEventListener('click', ()=> startFlashcards(main, VOCAB));
+  document.getElementById('allList').addEventListener('click', ()=> renderVocabList(main, 'all'));
+}
+function renderVocabList(main, cat){
+  const words = cat==='all' ? VOCAB : VOCAB.filter(w=>w.c===cat);
+  main.innerHTML = `<span class="backlink" id="back">← Все темы</span>
+    <h2 class="title">${cat==='all'?'Все слова':CATS[cat]}</h2>
+    <div class="btn-row"><button class="btn seal" id="startCards">🗂 Учить карточками</button></div>
+    <div id="wlist"></div>`;
+  document.getElementById('back').addEventListener('click', ()=> renderVocabHome(main));
+  document.getElementById('startCards').addEventListener('click', ()=> startFlashcards(main, words));
+  const wlist = document.getElementById('wlist');
+  wlist.innerHTML = words.map(w=>{
+    const lv = progress.vocab[w.id]||0;
+    return `<div class="list-item" data-id="${w.id}">
+      <div><span class="dot dot${lv}"></span><span class="name cn">${w.h}</span> <span class="muted">${w.p}</span>
+      <div class="meta">${w.r}</div></div>
+      <button class="speak-btn" data-speak="${esc(w.h)}">🔊</button>
+    </div>`;
+  }).join('');
+  wlist.querySelectorAll('[data-speak]').forEach(b=> b.addEventListener('click',(e)=>{ e.stopPropagation(); speak(b.dataset.speak); }));
+}
+function startFlashcards(main, words){
+  const queue = shuffle(words);
+  let idx=0, flipped=false;
+  function render(){
+    if(idx>=queue.length){
+      main.innerHTML = `<h2 class="title">Готово! 🎉</h2><p>Карточки этой подборки пройдены.</p>
+        <div class="btn-row"><button class="btn seal" id="again">Ещё раз</button><button class="btn ghost" id="back2">← К темам</button></div>`;
+      document.getElementById('again').addEventListener('click', ()=> startFlashcards(main, words));
+      document.getElementById('back2').addEventListener('click', ()=> renderVocabHome(main));
+      return;
+    }
+    const w = queue[idx];
+    flipped=false;
+    main.innerHTML = `<span class="backlink" id="back">← Выйти</span>
+      <p class="muted">Карточка ${idx+1} из ${queue.length}</p>
+      <div class="flash" id="flashCard">
+        <div class="cn-big">${w.h}</div>
+        <div id="revealArea" style="text-align:center;min-height:40px;"></div>
+      </div>
+      <div class="btn-row" style="justify-content:center">
+        <button class="speak-btn" id="sp" style="width:44px;height:44px;font-size:18px">🔊</button>
+      </div>
+      <div id="rateRow" class="btn-row" style="display:none;margin-top:16px">
+        <button class="btn ghost" id="r0">Не знаю</button>
+        <button class="btn" id="r1">Учу</button>
+        <button class="btn jade" id="r2">Знаю</button>
+      </div>
+      <p class="muted" style="text-align:center;margin-top:10px" id="tapHint">Нажми на карточку, чтобы увидеть пиньинь и перевод</p>
+    `;
+    document.getElementById('back').addEventListener('click', ()=> renderVocabHome(main));
+    document.getElementById('sp').addEventListener('click', ()=> speak(w.h));
+    document.getElementById('flashCard').addEventListener('click', ()=>{
+      if(flipped) return;
+      flipped=true;
+      document.getElementById('revealArea').innerHTML = `<div class="py-big">${w.p}</div><div class="ru-big">${w.r}</div>`;
+      document.getElementById('rateRow').style.display='flex';
+      document.getElementById('tapHint').style.display='none';
+    });
+    ['r0','r1','r2'].forEach((id,lv)=>{
+      document.getElementById(id).addEventListener('click', async ()=>{
+        progress.vocab[w.id]=lv; await saveProgress();
+        idx++; render();
+      });
+    });
+  }
+  render();
+}
+
+/* ============ GRAMMAR ============ */
+function renderGrammarHome(main){
+  main.innerHTML = `<h2 class="title">Грамматика HSK1</h2><p class="muted">14 ключевых тем. В каждой — объяснение, примеры и мини-проверка.</p><div id="glist"></div>`;
+  const glist = document.getElementById('glist');
+  glist.innerHTML = GRAMMAR.map(g=>{
+    const done = progress.grammar.includes(g.id);
+    return `<div class="list-item" data-id="${g.id}">
+      <div><div class="name">${g.title}</div></div>
+      <div class="stamp ${done?'':'off'}">${done?'会':'？'}</div>
+    </div>`;
+  }).join('');
+  glist.querySelectorAll('[data-id]').forEach(el=> el.addEventListener('click', ()=> renderGrammarLesson(main, el.dataset.id)) );
+}
+function renderGrammarLesson(main, id){
+  const g = GRAMMAR.find(x=>x.id===id);
+  main.innerHTML = `<span class="backlink" id="back">← Все темы</span>
+    <h2 class="title">${g.title}</h2>
+    <div class="card"><p>${g.explain}</p></div>
+    <h3 class="sub-title">Примеры</h3>
+    ${g.ex.map(e=>`<div class="card"><div class="row"><span class="cn" style="font-size:17px">${e[0]}</span><button class="speak-btn" data-speak="${esc(e[0])}">🔊</button></div>
+      <div class="muted">${e[1]}</div><div style="margin-top:4px">${e[2]}</div></div>`).join('')}
+    <div class="btn-row"><button class="btn seal" id="startQuiz">Проверить себя →</button></div>
+  `;
+  document.getElementById('back').addEventListener('click', ()=> renderGrammarHome(main));
+  main.querySelectorAll('[data-speak]').forEach(b=> b.addEventListener('click', ()=> speak(b.dataset.speak)));
+  document.getElementById('startQuiz').addEventListener('click', ()=> runGrammarQuiz(main, g));
+}
+function runGrammarQuiz(main, g){
+  let idx=0, correct=0;
+  function render(){
+    if(idx>=g.quiz.length){
+      const pass = correct===g.quiz.length;
+      main.innerHTML = `<h2 class="title">${pass?'Отлично! 🌟':'Почти получилось'}</h2>
+        <p>Правильных ответов: ${correct} из ${g.quiz.length}</p>
+        <div class="btn-row"><button class="btn ghost" id="retry">Повторить</button><button class="btn seal" id="done">К списку тем</button></div>`;
+      document.getElementById('retry').addEventListener('click', ()=> runGrammarQuiz(main, g));
+      document.getElementById('done').addEventListener('click', async ()=>{
+        if(pass && !progress.grammar.includes(g.id)){ progress.grammar.push(g.id); await saveProgress(); }
+        renderGrammarHome(main);
+      });
+      return;
+    }
+    const item = g.quiz[idx];
+    const opts = shuffle(item.o);
+    main.innerHTML = `<p class="muted">Вопрос ${idx+1} из ${g.quiz.length}</p>
+      <div class="card"><p style="font-size:16px">${item.q}</p></div>
+      <div id="opts"></div><div id="fb"></div>`;
+    const optsEl = document.getElementById('opts');
+    optsEl.innerHTML = opts.map(o=>`<button class="opt" data-o="${esc(o)}">${o}</button>`).join('');
+    optsEl.querySelectorAll('.opt').forEach(b=> b.addEventListener('click', ()=>{
+      optsEl.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      const ok = b.dataset.o===item.a;
+      b.classList.add(ok?'correct':'wrong');
+      if(!ok) optsEl.querySelectorAll('.opt').forEach(x=>{ if(x.dataset.o===item.a) x.classList.add('correct'); });
+      if(ok) correct++;
+      document.getElementById('fb').innerHTML = `<div class="feedback ${ok?'ok':'bad'}">${ok?'Верно!':'Правильный ответ: '+item.a}</div>
+        <div class="btn-row"><button class="btn seal" id="next">Дальше →</button></div>`;
+      document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+    }));
+  }
+  render();
+}
+
+/* ============ READING ============ */
+function renderReadingHome(main){
+  main.innerHTML = `<h2 class="title">Чтение</h2><p class="muted">Короткие тексты из слов, которые ты уже знаешь.</p><div id="rlist"></div>`;
+  document.getElementById('rlist').innerHTML = READING.map(r=>{
+    const rp = progress.reading[r.id];
+    return `<div class="list-item" data-id="${r.id}">
+      <div><div class="name">${r.title}</div>${rp?`<div class="meta">Результат: ${rp.score}/${r.q.length}</div>`:''}</div>
+      <div class="stamp ${rp&&rp.done?'':'off'}">${rp&&rp.done?'读':'？'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('rlist').querySelectorAll('[data-id]').forEach(el=> el.addEventListener('click', ()=> renderReadingText(main, el.dataset.id)));
+}
+function renderReadingText(main, id){
+  const r = READING.find(x=>x.id===id);
+  main.innerHTML = `<span class="backlink" id="back">← Все тексты</span>
+    <h2 class="title">${r.title}</h2>
+    <div class="card">${r.text.map(line=>`<div class="row" style="margin-bottom:8px"><span class="cn">${line}</span><button class="speak-btn" data-speak="${esc(line)}">🔊</button></div>`).join('')}</div>
+    <div class="btn-row"><button class="btn seal" id="startQ">Ответить на вопросы →</button></div>`;
+  document.getElementById('back').addEventListener('click', ()=> renderReadingHome(main));
+  main.querySelectorAll('[data-speak]').forEach(b=> b.addEventListener('click', ()=> speak(b.dataset.speak)));
+  document.getElementById('startQ').addEventListener('click', ()=> runReadingQuiz(main, r));
+}
+function runReadingQuiz(main, r){
+  let idx=0, correct=0;
+  function render(){
+    if(idx>=r.q.length){
+      main.innerHTML = `<h2 class="title">Текст пройден</h2><p>Правильных ответов: ${correct} из ${r.q.length}</p>
+        <div class="btn-row"><button class="btn ghost" id="retry">Повторить</button><button class="btn seal" id="done">К списку текстов</button></div>`;
+      document.getElementById('retry').addEventListener('click', ()=> runReadingQuiz(main, r));
+      document.getElementById('done').addEventListener('click', async ()=>{
+        progress.reading[r.id] = {done:true, score:correct};
+        await saveProgress();
+        renderReadingHome(main);
+      });
+      return;
+    }
+    const item = r.q[idx];
+    const opts = shuffle(item.o);
+    main.innerHTML = `<p class="muted">Вопрос ${idx+1} из ${r.q.length}</p>
+      <div class="card"><p style="font-size:16px">${item.q}</p></div>
+      <div id="opts"></div><div id="fb"></div>`;
+    const optsEl = document.getElementById('opts');
+    optsEl.innerHTML = opts.map(o=>`<button class="opt cn" data-o="${esc(o)}">${o}</button>`).join('');
+    optsEl.querySelectorAll('.opt').forEach(b=> b.addEventListener('click', ()=>{
+      optsEl.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      const ok = b.dataset.o===item.a;
+      b.classList.add(ok?'correct':'wrong');
+      if(!ok) optsEl.querySelectorAll('.opt').forEach(x=>{ if(x.dataset.o===item.a) x.classList.add('correct'); });
+      if(ok) correct++;
+      document.getElementById('fb').innerHTML = `<div class="feedback ${ok?'ok':'bad'}">${ok?'Верно!':'Правильный ответ: '+item.a}</div>
+        <div class="btn-row"><button class="btn seal" id="next">Дальше →</button></div>`;
+      document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+    }));
+  }
+  render();
+}
+
+/* ============ LISTENING ============ */
+function renderListenHome(main){
+  main.innerHTML = `<h2 class="title">Аудирование</h2>
+    <p class="muted">Слушай и выбирай правильный перевод. Нажимай на 🔊, чтобы услышать снова.</p>
+    <div class="card"><strong>Рекорд:</strong> ${progress.listenBest}%</div>
+    <div class="btn-row"><button class="btn seal" id="wmode">🔤 Слова (10 раундов)</button><button class="btn seal" id="smode">💬 Предложения (10 раундов)</button></div>
+    <p class="muted" style="margin-top:14px">Если звук не воспроизводится — проверь, что в браузере включён голос для китайского (zh-CN). На некоторых устройствах его нужно один раз установить в системных настройках.</p>`;
+  document.getElementById('wmode').addEventListener('click', ()=> runListen(main, 'word'));
+  document.getElementById('smode').addEventListener('click', ()=> runListen(main, 'sentence'));
+}
+function runListen(main, mode){
+  const pool = mode==='word' ? pickN(VOCAB, Math.min(10, VOCAB.length)) : pickN(SENTENCES, Math.min(10, SENTENCES.length));
+  let idx=0, correct=0;
+  function render(){
+    if(idx>=pool.length){
+      const pct = Math.round(correct/pool.length*100);
+      main.innerHTML = `<h2 class="title">Раунд завершён 🎧</h2><p>Правильно: ${correct} из ${pool.length} (${pct}%)</p>
+        <div class="btn-row"><button class="btn ghost" id="retry">Ещё раз</button><button class="btn seal" id="done">← К аудированию</button></div>`;
+      document.getElementById('retry').addEventListener('click', ()=> runListen(main, mode));
+      document.getElementById('done').addEventListener('click', async ()=>{
+        if(pct>progress.listenBest){ progress.listenBest=pct; await saveProgress(); }
+        renderListenHome(main);
+      });
+      return;
+    }
+    const item = pool[idx];
+    const text = mode==='word' ? item.h : item.cn;
+    const correctAns = mode==='word' ? item.r : item.ru;
+    const distractorsFrom = mode==='word' ? VOCAB.filter(w=>w!==item).map(w=>w.r) : SENTENCES.filter(s=>s!==item).map(s=>s.ru);
+    const opts = shuffle([correctAns, ...pickN(distractorsFrom,3)]);
+    main.innerHTML = `<p class="muted">Раунд ${idx+1} из ${pool.length}</p>
+      <div class="flash" style="min-height:120px"><button class="speak-btn" id="playBtn" style="width:60px;height:60px;font-size:24px;margin:0 auto">🔊</button>
+      <p class="muted" style="text-align:center;margin-top:10px">Нажми, чтобы прослушать</p></div>
+      <div id="opts" style="margin-top:14px"></div><div id="fb"></div>`;
+    document.getElementById('playBtn').addEventListener('click', ()=> speak(text));
+    speak(text);
+    const optsEl = document.getElementById('opts');
+    optsEl.innerHTML = opts.map(o=>`<button class="opt" data-o="${esc(o)}">${o}</button>`).join('');
+    optsEl.querySelectorAll('.opt').forEach(b=> b.addEventListener('click', ()=>{
+      optsEl.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      const ok = b.dataset.o===correctAns;
+      b.classList.add(ok?'correct':'wrong');
+      if(!ok) optsEl.querySelectorAll('.opt').forEach(x=>{ if(x.dataset.o===correctAns) x.classList.add('correct'); });
+      if(ok) correct++;
+      document.getElementById('fb').innerHTML = `<div class="feedback ${ok?'ok':'bad'}">${ok?'Верно!':'Правильный ответ: '+correctAns}</div>
+        <div class="row" style="margin-top:6px"><span class="muted cn">${text}</span></div>
+        <div class="btn-row"><button class="btn seal" id="next">Дальше →</button></div>`;
+      document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+    }));
+  }
+  render();
+}
+
+/* ============ WRITING (word order) ============ */
+function renderWriteHome(main){
+  main.innerHTML = `<h2 class="title">Письмо</h2>
+    <p class="muted">Собери китайское предложение из слов в правильном порядке по русскому переводу.</p>
+    <div class="card"><strong>Рекорд:</strong> ${progress.writeBest}%</div>
+    <div class="btn-row"><button class="btn seal" id="start">Начать (10 предложений) →</button></div>`;
+  document.getElementById('start').addEventListener('click', ()=> runWrite(main));
+}
+function runWrite(main){
+  const pool = pickN(SENTENCES, Math.min(10, SENTENCES.length));
+  let idx=0, correct=0;
+  function render(){
+    if(idx>=pool.length){
+      const pct = Math.round(correct/pool.length*100);
+      main.innerHTML = `<h2 class="title">Готово ✍️</h2><p>Правильно: ${correct} из ${pool.length} (${pct}%)</p>
+        <div class="btn-row"><button class="btn ghost" id="retry">Ещё раз</button><button class="btn seal" id="done">← К письму</button></div>`;
+      document.getElementById('retry').addEventListener('click', ()=> runWrite(main));
+      document.getElementById('done').addEventListener('click', async ()=>{
+        if(pct>progress.writeBest){ progress.writeBest=pct; await saveProgress(); }
+        renderWriteHome(main);
+      });
+      return;
+    }
+    const item = pool[idx];
+    let built = [];
+    let chips = shuffle(item.t.map((w,i)=>({w,i})));
+    function draw(){
+      main.innerHTML = `<p class="muted">Предложение ${idx+1} из ${pool.length}</p>
+        <div class="card"><strong>${item.ru}</strong></div>
+        <div class="answer-box" id="ansBox"></div>
+        <div id="chipBox"></div>
+        <div class="btn-row"><button class="btn ghost" id="undo">Назад</button><button class="btn seal" id="check" ${built.length===item.t.length?'':'disabled'}>Проверить</button></div>
+        <div id="fb"></div>`;
+      document.getElementById('ansBox').innerHTML = built.map(b=>`<span class="chip">${b.w}</span>`).join('') || '<span class="muted">Собери предложение снизу</span>';
+      document.getElementById('chipBox').innerHTML = chips.map(c=>`<span class="chip ${built.find(b=>b.i===c.i)?'used':''}" data-i="${c.i}">${c.w}</span>`).join('');
+      document.getElementById('chipBox').querySelectorAll('.chip').forEach(el=> el.addEventListener('click', ()=>{
+        const i = parseInt(el.dataset.i);
+        if(built.find(b=>b.i===i)) return;
+        built.push({w:item.t[i], i});
+        draw();
+      }));
+      document.getElementById('undo').addEventListener('click', ()=>{ built.pop(); draw(); });
+      const checkBtn = document.getElementById('check');
+      if(!checkBtn.disabled){
+        checkBtn.addEventListener('click', ()=>{
+          const ans = built.map(b=>b.w).join('');
+          const ok = ans === item.t.join('');
+          if(ok) correct++;
+          document.getElementById('fb').innerHTML = `<div class="feedback ${ok?'ok':'bad'}">${ok?'Верно! 完':'Правильный порядок: '+item.t.join('')}</div>
+            <div class="btn-row"><button class="btn seal" id="next">Дальше →</button></div>`;
+          document.getElementById('chipBox').querySelectorAll('.chip').forEach(c=>c.style.pointerEvents='none');
+          document.getElementById('undo').disabled=true; checkBtn.disabled=true;
+          document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+        });
+      }
+    }
+    draw();
+  }
+  render();
+}
+
+/* ============ FINAL TEST ============ */
+function buildTestQuestions(){
+  const qs = [];
+  pickN(VOCAB,6).forEach(w=>{
+    const distractors = pickN(VOCAB.filter(x=>x!==w).map(x=>x.r),3);
+    qs.push({type:'vocab', prompt:`Что означает «${w.h}» (${w.p})?`, o:shuffle([w.r,...distractors]), a:w.r});
+  });
+  const gPool=[]; GRAMMAR.forEach(g=>g.quiz.forEach(qq=>gPool.push(qq)));
+  pickN(gPool,6).forEach(qq=> qs.push({type:'grammar', prompt:qq.q, o:shuffle(qq.o), a:qq.a}));
+  const rPool=[]; READING.forEach(r=>r.q.forEach(qq=>rPool.push({...qq, ctx:r.text.join(''), title:r.title})));
+  pickN(rPool,4).forEach(qq=> qs.push({type:'reading', prompt:`«${qq.title}»: ${qq.q}`, extra:qq.ctx, o:shuffle(qq.o), a:qq.a}));
+  pickN(SENTENCES,4).forEach(s=>{
+    const wrong1 = shuffle(s.t).join('');
+    const wrong2 = shuffle(s.t).join('');
+    const opts = Array.from(new Set([s.cn, wrong1, wrong2])).slice(0,3);
+    while(opts.length<4){ const w = shuffle(s.t).join(''); if(!opts.includes(w)) opts.push(w); }
+    qs.push({type:'write', prompt:`Собери фразу: «${s.ru}»`, o:shuffle(opts), a:s.cn});
+  });
+  return shuffle(qs);
+}
+function renderTestHome(main){
+  const lastTest = progress.tests.length ? progress.tests[progress.tests.length-1] : null;
+  main.innerHTML = `<h2 class="title">Комплексный тест</h2>
+    <p class="muted">20 вопросов вперемешку: слова, грамматика, чтение и построение фраз — как на настоящем экзамене.</p>
+    ${lastTest?`<div class="card"><strong>Последний результат:</strong> ${lastTest.score}/${lastTest.total} · ${lastTest.date}</div>`:''}
+    ${progress.tests.length>1?`<div class="card"><strong>История:</strong><br>${progress.tests.slice(-5).map(t=>`${t.date}: ${t.score}/${t.total}`).join('<br>')}</div>`:''}
+    <div class="btn-row"><button class="btn seal" id="start">Начать тест →</button></div>`;
+  document.getElementById('start').addEventListener('click', ()=> runTest(main));
+}
+function runTest(main){
+  const qs = buildTestQuestions();
+  let idx=0, correct=0;
+  function render(){
+    if(idx>=qs.length){
+      const date = new Date().toLocaleDateString('ru-RU');
+      main.innerHTML = `<h2 class="title">Тест завершён</h2>
+        <div class="card"><div class="row"><strong>Результат</strong><span class="pill">${correct}/${qs.length}</span></div>
+        <div class="progress-bar"><div style="width:${Math.round(correct/qs.length*100)}%"></div></div></div>
+        <p>${correct/qs.length>=0.8?'Отличный результат — ты хорошо готов(а) к этой теме! 🎉':'Есть над чем поработать — загляни в разделы, где были ошибки.'}</p>
+        <div class="btn-row"><button class="btn ghost" id="retry">Пройти ещё раз</button><button class="btn seal" id="done">К обзору</button></div>`;
+      document.getElementById('retry').addEventListener('click', ()=> runTest(main));
+      document.getElementById('done').addEventListener('click', async ()=>{
+        progress.tests.push({date, score:correct, total:qs.length});
+        await saveProgress();
+        go('dash');
+      });
+      return;
+    }
+    const item = qs[idx];
+    main.innerHTML = `<p class="muted">Вопрос ${idx+1} из ${qs.length}</p>
+      <div class="card"><p style="font-size:15.5px">${item.prompt}</p>${item.extra?`<p class="muted cn">${item.extra}</p>`:''}</div>
+      <div id="opts"></div><div id="fb"></div>`;
+    const optsEl = document.getElementById('opts');
+    optsEl.innerHTML = item.o.map(o=>`<button class="opt ${item.type!=='vocab'&&item.type!=='grammar'?'cn':''}" data-o="${esc(o)}">${o}</button>`).join('');
+    optsEl.querySelectorAll('.opt').forEach(b=> b.addEventListener('click', ()=>{
+      optsEl.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      const ok = b.dataset.o===item.a;
+      b.classList.add(ok?'correct':'wrong');
+      if(!ok) optsEl.querySelectorAll('.opt').forEach(x=>{ if(x.dataset.o===item.a) x.classList.add('correct'); });
+      if(ok) correct++;
+      document.getElementById('fb').innerHTML = `<div class="feedback ${ok?'ok':'bad'}">${ok?'Верно!':'Правильный ответ: '+item.a}</div>
+        <div class="btn-row"><button class="btn seal" id="next">Дальше →</button></div>`;
+      document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+    }));
+  }
+  render();
+}
+
+/* ============ INIT ============ */
+(async function init(){
+  await loadProgress();
+  renderTabs();
+  go('dash');
+  if('speechSynthesis' in window){ speechSynthesis.getVoices(); }
+})();
+</script>
+</body>
+</html>
